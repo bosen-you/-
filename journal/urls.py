@@ -4,4 +4,6 @@ from .views import *
 urlpatterns = [
     path('' , JournalList.as_view() , name = 'jou_list'),
     path('create/' , JournalCreate.as_view() , name = 'jou_create'),
+    path('<int:pk>/edit/' , JournalEdit.as_view() , name = 'jou_edit'),
+    
 ]
