@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import ListView , CreateView , UpdateView
+from django.views.generic import ListView , CreateView , UpdateView , DeleteView
 from .models import Journal
 from django.urls import reverse_lazy
 # Create your views here.
@@ -21,3 +21,9 @@ class JournalEdit(UpdateView):
     fields = ['content']
     success_url = reverse_lazy('jou_list')
     template_name = 'form.html'
+
+#日誌刪除
+class JournalDelete(DeleteView):
+    model = Journal
+    success_url = reverse_lazy('jou_list')
+    template_name = 'confirm_delete.html'
