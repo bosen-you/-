@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-</head>
-<body>
-    <h2>我的日誌</h2>
+{% extends "base.html" %}
+
+{% block contant %}
+<h2>我的日誌</h2>
     <table>
         <tr>
             <th>時間</th>
@@ -16,8 +11,14 @@
         {% for journal in jou_list %}
         <tr>
             <td>{{journal.created|date:'Y-m-d'}}</td>
+            <td>
+                <a href="{% url 'jou_edit' , journal.id %}">{{ journal.content}}</a>
+            </td>
+            <td>
+                <a href="{% url 'jou_delete' , journal.id %}">刪除</a>
+            </td>
         </tr>
         {% endfor %}
     </table>
-</body>
-</html>
+{% endblock  %}
+    

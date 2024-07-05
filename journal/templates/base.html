@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數位助理</title>
+</head>
+<body>
+    <h1>數位助理</h1>
+    <div>
+        <a href="{% url 'jou_list' %}">日誌列表</a>
+        <a href="{% url 'jou_create' %}">寫日誌</a>
+    </div>
+    <div>{% block content %}{% endblock  %}</div>
+</body>
+</html>
