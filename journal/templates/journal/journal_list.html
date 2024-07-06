@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block contant %}
+{% block content %}
 <h2>我的日誌</h2>
     <table>
         <tr>
@@ -8,14 +8,14 @@
             <th>項目</th>
             <th>操作</th>
         </tr>
-        {% for journal in jou_list %}
+        {% for journal in journal_list %}
         <tr>
             <td>{{journal.created|date:'Y-m-d'}}</td>
             <td>
-                <a href="{% url 'jou_edit' , journal.id %}">{{ journal.content}}</a>
+                <a href="{% url 'jou_edit' journal.id %}">{{ journal.content }}</a>
             </td>
             <td>
-                <a href="{% url 'jou_delete' , journal.id %}">刪除</a>
+                <a href="{% url 'jou_delete' journal.id %}">刪除</a>
             </td>
         </tr>
         {% endfor %}

@@ -27,3 +27,4 @@ class JournalDelete(DeleteView):
     model = Journal
     success_url = reverse_lazy('jou_list')
     template_name = 'confirm_delete.html'
+
