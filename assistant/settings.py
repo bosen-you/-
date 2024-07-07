@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'journal',
+    'expenses',
 ]
 
 MIDDLEWARE = [
@@ -123,4 +124,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_LOGIN = '/'
+LOGIN_REDIRECT_URL = '/'

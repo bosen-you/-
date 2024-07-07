@@ -11,13 +11,13 @@
         <a href="{% url 'jou_list' %}">日誌列表</a>
         <a href="{% url 'jou_create' %}">寫日誌</a>
         <!-- 已登入 -->
-        {% if user.is.authenticated %}
+        {% if user.is_authenticated %}
             {{ user.name }}
             <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
                 <button type = 'submit'>登出</button>   <!-- # 按鈕-->
             </form>
-        {& else %}
+        {% else %}
             <a href="{% url 'login' %}">登入</a>
         {% endif %}
     </div>
