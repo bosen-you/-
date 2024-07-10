@@ -10,6 +10,8 @@
     <div>
         <a href="{% url 'jou_list' %}">日誌列表</a>
         <a href="{% url 'jou_create' %}">寫日誌</a>
+        <a href="{% url 'exp_list' %}">支出列表</a>
+        <a href="{& url 'exp_create' %}">新增支出</a>
         <!-- 已登入 -->
         {% if user.is_authenticated %}
             {{ user.name }}

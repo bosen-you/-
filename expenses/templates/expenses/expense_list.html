@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
     <h2>我的支出紀錄</h2>
     <table>
         <tr>
@@ -19,11 +13,11 @@
         <tr>
             <td>{{ expense.time|date:'Y-m-d' }}</td> <!---->
             <td>
-                <a href="{% url 'exp_update' , expense.id %}">{{ expense.item }}</a>
+                <a href="{% url 'exp_update' expense.id %}">{{ expense.item }}</a>
             </td>
             <td>{{ expense.get_category_display }}</td>
         </tr>
         {% endfor %}
     </table>
-</body>
-</html>
+    {% include 'pagination.html' %}
+{% endblock  %}
