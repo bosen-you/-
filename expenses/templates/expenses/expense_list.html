@@ -16,7 +16,13 @@
             <th>功能</th>
         </tr>
         {% for expense in exp_list %}
-        <tr></tr>
+        <tr>
+            <td>{{ expense.time|date:'Y-m-d' }}</td> <!---->
+            <td>
+                <a href="{% url 'exp_update' , expense.id %}">{{ expense.item }}</a>
+            </td>
+            <td>{{ expense.get_category_display }}</td>
+        </tr>
         {% endfor %}
     </table>
 </body>
