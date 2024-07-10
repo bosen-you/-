@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>我的支出紀錄</h2>
+    <table>
+        <tr>
+            <th>時間</th>
+            <th>項目</th>
+            <th>類別</th>
+            <th>金額</th>
+            <th>功能</th>
+        </tr>
+        {% for expense in exp_list %}
+        <tr></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
