@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>情緒手搖釀造廠</title>
+<meta name="description" content="30秒調一杯屬於你今天的情緒特調飲料">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3E7;
+    --paper:#FFFDF8;
+    --ink:#4A3F35;
+    --ink-soft:#8A7C6D;
+    --line: rgba(74,63,53,0.16);
+
+    --bubble:#BFE8E3;
+    --bubble-deep:#7FC9C0;
+    --tea:#A9764F;
+    --tea-deep:#6B4423;
+    --lava:#FF8064;
+    --lava-deep:#E8492F;
+
+    --gold:#FFC94A;
+    --pink:#F2B6C6;
+    --leaf:#9CBF8B;
+
+    --radius-lg: 30px;
+    --radius-md: 20px;
+    --radius-sm: 12px;
+    --shadow: 0 14px 34px rgba(74,63,53,0.16);
+    --shadow-sm: 0 6px 16px rgba(74,63,53,0.12);
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100%;
+    font-family:'Noto Sans TC', sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 8%, rgba(255,201,74,0.25), transparent 40%),
+      radial-gradient(circle at 88% 92%, rgba(159,207,192,0.35), transparent 45%),
+      var(--cream);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 14px;
+  }
+
+  .display{ font-family:'Ma Shan Zheng', cursive; letter-spacing:1px; }
+
+  #app{
+    width:100%;
+    max-width:440px;
+    position:relative;
+  }
+
+  .card{
+    background:var(--paper);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1.5px solid var(--line);
+    padding: 30px 26px 26px;
+    position:relative;
+    overflow:hidden;
+    animation: cardIn .5s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes cardIn{
+    from{ opacity:0; transform: translateY(14px) scale(.98); }
+    to{ opacity:1; transform: translateY(0) scale(1); }
+  }
+
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  .eyebrow{
+    font-size:13px;
+    color:var(--ink-soft);
+    letter-spacing:2px;
+    text-align:center;
+    margin-bottom:6px;
+  }
+  h1.title{
+    font-size:30px;
+    text-align:center;
+    margin:0 0 6px;
+    line-height:1.3;
+  }
+  p.sub{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:14.5px;
+    line-height:1.7;
+    margin: 0 0 18px;
+  }
+
+  .btn{
+    display:block;
+    width:100%;
+    border:none;
+    border-radius: 999px;
+    padding:15px 18px;
+    font-family:'Noto Sans TC', sans-serif;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s ease, box-shadow .15s ease, opacity .2s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); }
+  .btn:active{ transform: translateY(0px) scale(.98); }
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink);
+    border: 1.5px solid var(--line);
+    box-shadow:none;
+  }
+  .btn[disabled]{ opacity:.35; pointer-events:none; }
+  .btn.small{ padding:11px 16px; font-size:14px; width:auto; }
+
+  /* ---------- Intro ---------- */
+  .brewery-badge{
+    width:96px; height:96px; margin:0 auto 14px;
+    border-radius:50%;
+    background: conic-gradient(from 200deg, var(--bubble), var(--gold), var(--lava), var(--tea), var(--bubble));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow-sm);
+    animation: spinSlow 14s linear infinite;
+  }
+  @keyframes spinSlow{ to{ transform:rotate(360deg);} }
+  .brewery-badge span{
+    width:76px; height:76px; border-radius:50%;
+    background:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    font-size:34px;
+    animation: spinSlow 14s linear infinite reverse;
+  }
+
+  .steps-preview{
+    display:flex; justify-content:space-between; gap:8px;
+    margin: 18px 0 22px;
+  }
+  .steps-preview div{
+    flex:1; text-align:center; font-size:12px; color:var(--ink-soft);
+    padding:10px 4px; border-radius:14px; background: rgba(74,63,53,0.04);
+  }
+  .steps-preview b{ display:block; font-size:20px; margin-bottom:2px;}
+
+  /* ---------- Step header ---------- */
+  .step-head{ display:flex; align-items:center; gap:10px; margin-bottom:4px; }
+  .step-num{
+    width:30px; height:30px; border-radius:50%;
+    background:var(--ink); color:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:14px; flex:none;
+  }
+  .step-head h2{ font-size:19px; margin:0; }
+  .step-prompt{ color:var(--ink-soft); font-size:13.5px; margin: 6px 0 20px; padding-left:40px;}
+
+  .progress{
+    display:flex; gap:6px; margin-bottom:18px;
+  }
+  .progress i{
+    flex:1; height:5px; border-radius:4px; background: rgba(74,63,53,0.12);
+  }
+  .progress i.done{ background: var(--ink); }
+
+  /* ---------- Tubes (step 1) ---------- */
+  .tubes{
+    display:flex; justify-content:space-around; align-items:flex-end;
+    gap:10px; margin: 10px 0 22px; min-height:200px;
+  }
+  .tube-wrap{
+    display:flex; flex-direction:column; align-items:center;
+    cursor:pointer; background:none; border:none; padding:6px;
+    width:33%;
+  }
+  .tube{
+    position:relative;
+    width:56px; height:150px;
+    border:3px solid var(--ink);
+    border-radius: 16px 16px 34px 34px;
+    background: rgba(255,255,255,0.5);
+    overflow:hidden;
+    animation: wobble 3.4s ease-in-out infinite;
+    box-shadow: var(--shadow-sm);
+  }
+  .tube-wrap:nth-child(2) .tube{ animation-delay:.3s; }
+  .tube-wrap:nth-child(3) .tube{ animation-delay:.6s; }
+  @keyframes wobble{
+    0%,100%{ transform: rotate(-2deg); }
+    50%{ transform: rotate(2deg); }
+  }
+  .tube .liquid{
+    position:absolute; left:0; right:0; bottom:0;
+    height:72%;
+  }
+  .tube .liquid::before{
+    content:''; position:absolute; top:-6px; left:0; right:0; height:14px;
+    background:inherit; border-radius:50%;
+    animation: rippl 2.2s ease-in-out infinite;
+  }
+  @keyframes rippl{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(2px);} }
+
+  .liquid.bubble{ background: linear-gradient(180deg, var(--bubble), var(--bubble-deep)); }
+  .liquid.tea{ background: linear-gradient(180deg, var(--tea), var(--tea-deep)); }
+  .liquid.lava{ background: linear-gradient(180deg, var(--lava), var(--lava-deep)); }
+
+  .bub{
+    position:absolute; bottom:0; border-radius:50%;
+    background: rgba(255,255,255,0.75);
+    animation: rise 3s ease-in infinite;
+  }
+  @keyframes rise{
+    0%{ transform: translateY(0) scale(.6); opacity:0; }
+    15%{ opacity:.9; }
+    100%{ transform: translateY(-120px) scale(1); opacity:0; }
+  }
+  .steam{
+    position:absolute; top:-18px; width:3px; height:16px; border-radius:3px;
+    background: rgba(255,255,255,0.8);
+    animation: puff 1.8s ease-in-out infinite;
+  }
+  @keyframes puff{
+    0%{ transform: translateY(0) scaleY(.6); opacity:0;}
+    40%{ opacity:.8; }
+    100%{ transform: translateY(-22px) scaleY(1.3); opacity:0;}
+  }
+
+  .tube-label{
+    margin-top:10px; font-size:13px; font-weight:700; text-align:center;
+  }
+  .tube-desc{
+    font-size:11.5px; color:var(--ink-soft); text-align:center; margin-top:2px; line-height:1.4;
+  }
+
+  .cup-dock{
+    display:flex; justify-content:center; margin: 4px 0 20px;
+  }
+  .cup{
+    width:64px; height:56px;
+    border:3px solid var(--ink);
+    border-radius: 8px 8px 22px 22px;
+    position:relative;
+    background: rgba(74,63,53,0.03);
+    display:flex; align-items:flex-end; overflow:hidden;
+  }
+  .cup .fill{
+    width:100%; height:0%;
+    transition: height .6s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* ---------- Toppings (step 2) ---------- */
+  .jars{
+    display:grid; grid-template-columns: repeat(3, 1fr);
+    gap:10px; margin: 4px 0 18px;
+  }
+  .jar{
+    border: 2px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 12px 6px 10px;
+    text-align:center;
+    background: var(--paper);
+    cursor:pointer;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .jar:hover{ transform: translateY(-3px); }
+  .jar .icon{
+    width:44px; height:44px; margin:0 auto 8px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px;
+    background: rgba(74,63,53,0.06);
+  }
+  .jar .name{ font-size:12px; font-weight:700; line-height:1.4; }
+  .jar .emo{ font-size:10.5px; color:var(--ink-soft); margin-top:2px; }
+  .jar.selected{
+    border-color: var(--ink);
+    background: rgba(255,201,74,0.14);
+  }
+  .jar.selected .icon{ background: var(--gold); }
+  .jar.disabled{ opacity:.4; pointer-events:none; }
+
+  .hint{
+    text-align:center; font-size:12.5px; color:var(--ink-soft); min-height:18px; margin-bottom:6px;
+  }
+
+  /* ---------- Shake (step 3) ---------- */
+  .shake-zone{
+    text-align:center; padding: 6px 0 8px;
+  }
+  .shaker{
+    width:120px; height:130px; margin: 6px auto 18px;
+    position:relative;
+    user-select:none;
+  }
+  .shaker .jar-body{
+    width:100%; height:100%;
+    border:4px solid var(--ink);
+    border-radius: 24px 24px 46px 46px;
+    background: linear-gradient(180deg, var(--gold), var(--lava-deep));
+    box-shadow: var(--shadow);
+    transition: transform .08s ease;
+  }
+  .shaker.tap .jar-body{ transform: scale(.9,1.08) rotate(-4deg); }
+  .timer-bar{
+    height:8px; border-radius:8px; background: rgba(74,63,53,0.1);
+    overflow:hidden; margin-bottom:14px;
+  }
+  .timer-bar .fill{
+    height:100%; width:100%; background: var(--ink);
+    transform-origin:left;
+  }
+  .meter-label{
+    font-size:13px; color:var(--ink-soft); margin-bottom:6px;
+  }
+  .meter{
+    height:14px; border-radius:10px; background: rgba(74,63,53,0.08);
+    overflow:hidden; margin-bottom:20px;
+  }
+  .meter .fill{
+    height:100%; width:0%;
+    background: linear-gradient(90deg, var(--bubble-deep), var(--gold), var(--lava));
+    transition: width .12s ease;
+  }
+  .tap-target{
+    width:100%; padding: 22px 10px; border-radius: var(--radius-md);
+    background: rgba(74,63,53,0.04); border: 2px dashed var(--line);
+    font-weight:700; font-size:15px; cursor:pointer;
+  }
+  .burst{
+    position:absolute; font-size:16px; pointer-events:none;
+    animation: burstUp .7s ease-out forwards;
+  }
+  @keyframes burstUp{
+    0%{ opacity:1; transform: translateY(0) scale(1); }
+    100%{ opacity:0; transform: translateY(-46px) scale(1.4); }
+  }
+
+  /* ---------- Result ---------- */
+  .result-glow{
+    width:100%; aspect-ratio: 5/6;
+    border-radius: var(--radius-md);
+    padding: 22px 18px;
+    color:#fff;
+    position:relative; overflow:hidden;
+    margin-bottom:16px;
+    box-shadow: var(--shadow);
+    display:flex; flex-direction:column;
+  }
+  .result-glow::before{
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(circle at 30% 15%, rgba(255,255,255,0.35), transparent 55%);
+  }
+  .result-eyebrow{
+    font-size:11.5px; letter-spacing:2px; opacity:.85; position:relative;
+  }
+  .result-name{
+    font-size:26px; line-height:1.35; margin: 8px 0 10px; position:relative;
+  }
+  .result-formula{
+    font-size:12.5px; opacity:.92; margin-bottom:14px; position:relative;
+    background: rgba(255,255,255,0.18);
+    display:inline-block; padding:6px 10px; border-radius:10px;
+  }
+  .result-analysis{
+    font-size:13.5px; line-height:1.8; position:relative; margin-bottom:10px;
+  }
+  .result-quote{
+    margin-top:auto; font-size:13px; font-style:italic; opacity:.95; position:relative;
+    border-top: 1px solid rgba(255,255,255,0.3); padding-top:10px;
+  }
+
+  .redeem-box{
+    border: 2px dashed var(--line); border-radius: var(--radius-md);
+    padding: 16px; margin-bottom: 14px; text-align:center;
+  }
+  .redeem-box .store{ font-weight:700; font-size:14px; margin-bottom:4px; }
+  .redeem-box .code{
+    font-family: monospace; font-size:20px; letter-spacing:3px;
+    background: rgba(74,63,53,0.06); border-radius:10px; padding:8px 10px;
+    display:inline-block; margin: 8px 0; font-weight:700;
+  }
+  .redeem-box .note{ font-size:11.5px; color:var(--ink-soft); line-height:1.6; }
+  .verified{
+    color:#3E7A4E; font-weight:700; font-size:13.5px; margin-top:8px;
+    display:none; align-items:center; justify-content:center; gap:6px;
+  }
+  .verified.show{ display:flex; }
+
+  .row-btns{ display:flex; gap:10px; }
+  .row-btns .btn{ flex:1; }
+
+  .fine-print{ text-align:center; font-size:10.5px; color:var(--ink-soft); margin-top:14px; line-height:1.6; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
+
+  button:focus-visible, .jar:focus-visible, .tube-wrap:focus-visible{
+    outline: 3px solid var(--gold); outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="card">
+
+    <!-- INTRO -->
+    <section id="screen-intro" class="screen active">
+      <div class="brewery-badge"><span>🍹</span></div>
+      <div class="eyebrow">EMOTION BREWERY</div>
+      <h1 class="title display">情緒手搖釀造廠</h1>
+      <p class="sub">花 30 秒,把今天說不出口的心情,<br>調成一杯屬於你的特調。</p>
+      <div class="steps-preview">
+        <div><b>①</b>選基底</div>
+        <div><b>②</b>加配料</div>
+        <div><b>③</b>瘋狂搖</div>
+      </div>
+      <button class="btn" id="btn-start">開始釀造</button>
+    </section>
+
+    <!-- STEP 1: BASE -->
+    <section id="screen-step1" class="screen">
+      <div class="progress"><i class="done"></i><i></i><i></i></div>
+      <div class="step-head"><div class="step-num">1</div><h2>選擇基底</h2></div>
+      <p class="step-prompt">先感覺一下,今天身體是什麼狀態?點一支試管注入杯中。</p>
+
+      <div class="tubes" id="tubes"></div>
+
+      <div class="cup-dock"><div class="cup"><div class="fill" id="cup-fill"></div></div></div>
+      <div class="hint" id="step1-hint">點擊上方任一試管</div>
+    </section>
+
+    <!-- STEP 2: TOPPINGS -->
+    <section id="screen-step2" class="screen">
+      <div class="progress"><i class="done"></i><i class="done"></i><i></i></div>
+      <div class="step-head"><div class="step-num">2</div><h2>加入情緒配料</h2></div>
+      <p class="step-prompt">心裡還裝著什麼?挑 1〜2 種,誠實地加進去就好。</p>
+
+      <div class="jars" id="jars"></div>
+      <div class="hint" id="step2-hint">最多可選 2 種配料</div>
+      <button class="btn" id="btn-to-step3" disabled>加好了,開始攪拌</button>
+    </section>
+
+    <!-- STEP 3: SHAKE -->
+    <section id="screen-step3" class="screen">
+      <div class="progress"><i class="done"></i><i class="done"></i><i class="done"></i></div>
+      <div class="step-head"><div class="step-num">3</div><h2>瘋狂攪拌</h2></div>
+      <p class="step-prompt">把情緒好好搖勻。5 秒內狂點下方的罐子,越用力越好。</p>
+
+      <div class="shake-zone">
+        <div class="shaker" id="shaker"><div class="jar-body"></div></div>
+        <div class="timer-bar"><div class="fill" id="timer-fill"></div></div>
+        <div class="meter-label">宣洩指數</div>
+        <div class="meter"><div class="fill" id="meter-fill"></div></div>
+        <button class="tap-target" id="tap-target">👊 用力點我!</button>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="screen-result" class="screen">
+      <div class="result-glow" id="result-glow">
+        <div class="result-eyebrow">今日限定 · 情緒特調</div>
+        <div class="result-name display" id="result-name"></div>
+        <div class="result-formula" id="result-formula"></div>
+        <div class="result-analysis" id="result-analysis"></div>
+        <div class="result-quote" id="result-quote"></div>
+      </div>
+
+      <div class="redeem-box">
+        <div class="store" id="store-name">憑此畫面至門市兌換</div>
+        <div class="code" id="redeem-code">------</div>
+        <div class="note">出示本畫面給店員,由店員按下「確認核銷」即可兌換 / 折抵飲品。</div>
+        <button class="btn small ghost" id="btn-verify" style="margin-top:10px;">店員核銷（示範用）</button>
+        <div class="verified" id="verified-mark">✅ 已核銷</div>
+      </div>
+
+      <div class="row-btns">
+        <button class="btn ghost" id="btn-save">下載特調卡片</button>
+        <button class="btn" id="btn-restart">再釀一杯</button>
+      </div>
+      <div class="fine-print">此頁兌換碼僅為前端展示，實際核銷請串接店家後台或 POS 系統。</div>
+    </section>
+
+  </div>
+</div>
+
+<canvas id="export-canvas" width="720" height="960" style="display:none;"></canvas>
+
+<script>
+/* =========================================================
+   CONFIG — 依門市需求調整這裡即可
+   ========================================================= */
+const CONFIG = {
+  storeName: '得正 OO店',                 // 兌換門市名稱，換成實際店名
+  redeemPrefix: 'EB',                     // 兌換碼前綴
+  redeemInstruction: '出示本畫面給店員，由店員按下「確認核銷」即可兌換 / 折抵飲品。'
+};
+
+/* =========================================================
+   DATA
+   ========================================================= */
+const BASES = [
+  {
+    id:'bubble', name:'透明氣泡水', kind:'bubble',
+    mood:'今天很輕盈、平靜，好像沒什麼特別的念頭',
+    weightLabel:'平靜', teaBase:'氣泡水系',
+    adjs:['清透的','安靜的','無波的'],
+    fx:'bubbles'
+  },
+  {
+    id:'tea', name:'濃厚深色茶', kind:'tea',
+    mood:'今天有點沉重、疲憊，像被灌了一整杯水泥',
+    weightLabel:'沉重', teaBase:'厚萃烏龍',
+    adjs:['厚重的','沉甸甸的','緩慢的'],
+    fx:'steam'
+  },
+  {
+    id:'lava', name:'冒煙紅色岩漿', kind:'lava',
+    mood:'今天很焦躁、心跳偏快，心裡有一股說不上來的火',
+    weightLabel:'滾燙', teaBase:'紅焰可可',
+    adjs:['灼熱的','翻騰的','躁動的'],
+    fx:'steam'
+  }
+];
+
+const TOPPINGS = [
+  { id:'cloud',   name:'想太多的烏雲',       emotion:'焦慮', icon:'☁️', flavor:'仙草凍',   color:'#8E9AAF' },
+  { id:'candy',   name:'易燃易爆炸的跳跳糖', emotion:'生氣', icon:'⚡', flavor:'跳跳珍珠', color:'#FF4E4E' },
+  { id:'rain',    name:'下不停的梅雨',       emotion:'難過', icon:'🌧️', flavor:'梅子晶球', color:'#5B8AC1' },
+  { id:'battery', name:'乾涸的廢電池',       emotion:'疲累', icon:'🔋', flavor:'黑糖波霸', color:'#6B6B6B' },
+  { id:'star',    name:'亮晶晶的星星',       emotion:'開心', icon:'⭐', flavor:'金萱奶蓋', color:'#FFC94A' },
+];
+
+const EMOTION_QUOTES = {
+  '焦慮': '烏雲不會一直佔據天空，你只是需要一點時間看見光。',
+  '生氣': '生氣代表你在乎，別急著滅火，先讓自己被好好聽見。',
+  '難過': '雨總會停，你不需要在雨中假裝晴天。',
+  '疲累': '電量不足不是你的錯，今天，允許自己慢慢充電。',
+  '開心': '把這份開心好好收著，它會在低潮時替你發光。'
+};
+const GENERAL_QUOTES = {
+  'bubble': '留白不是沒有感覺，而是允許自己慢慢來。',
+  'tea': '累的時候，不用假裝自己很有力氣。',
+  'lava': '心跳很快的時候，先深呼吸，你沒有做錯什麼。'
+};
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  baseId: null,
+  toppingIds: [],
+  taps: 0,
+  timerId: null,
+  timeLeft: 5,
+};
+
+/* =========================================================
+   UTIL
+   ========================================================= */
+function $(sel){ return document.querySelector(sel); }
+function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
+function showScreen(id){
+  $all('.screen').forEach(s => s.classList.remove('active'));
+  $('#'+id).classList.add('active');
+}
+function getBase(){ return BASES.find(b => b.id === state.baseId); }
+function getToppings(){ return state.toppingIds.map(id => TOPPINGS.find(t => t.id === id)); }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* =========================================================
+   BUILD STEP 1 — TUBES
+   ========================================================= */
+function buildTubes(){
+  const wrap = $('#tubes');
+  wrap.innerHTML = '';
+  BASES.forEach(base => {
+    const btn = document.createElement('button');
+    btn.className = 'tube-wrap';
+    btn.setAttribute('aria-label', base.name);
+    btn.innerHTML = `
+      <div class="tube">
+        <div class="liquid ${base.kind}">
+          ${base.fx === 'bubbles' ? renderBubbles() : renderSteam()}
+        </div>
+      </div>
+      <div class="tube-label">${base.name}</div>
+      <div class="tube-desc">${base.mood}</div>
+    `;
+    btn.addEventListener('click', () => selectBase(base.id, btn));
+    wrap.appendChild(btn);
+  });
+}
+function renderBubbles(){
+  let html = '';
+  for(let i=0;i<5;i++){
+    const left = 8 + Math.random()*70;
+    const size = 4 + Math.random()*5;
+    const delay = Math.random()*3;
+    html += `<span class="bub" style="left:${left}%;width:${size}px;height:${size}px;animation-delay:${delay}s;"></span>`;
+  }
+  return html;
+}
+function renderSteam(){
+  let html = '';
+  for(let i=0;i<3;i++){
+    const left = 20 + i*22 + Math.random()*8;
+    const delay = Math.random()*1.5;
+    html += `<span class="steam" style="left:${left}%;animation-delay:${delay}s;"></span>`;
+  }
+  return html;
+}
+
+function selectBase(id, el){
+  state.baseId = id;
+  const base = getBase();
+  $('#cup-fill').style.height = '78%';
+  $('#cup-fill').style.background = getComputedStyle(document.documentElement).getPropertyValue(
+    base.kind === 'bubble' ? '--bubble-deep' : base.kind === 'tea' ? '--tea-deep' : '--lava-deep'
+  );
+  $('#step1-hint').textContent = `已注入「${base.name}」`;
+  setTimeout(() => { buildJars(); showScreen('screen-step2'); }, 550);
+}
+
+/* =========================================================
+   BUILD STEP 2 — TOPPINGS
+   ========================================================= */
+function buildJars(){
+  const wrap = $('#jars');
+  wrap.innerHTML = '';
+  TOPPINGS.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'jar';
+    el.tabIndex = 0;
+    el.dataset.id = t.id;
+    el.innerHTML = `
+      <div class="icon">${t.icon}</div>
+      <div class="name">${t.name}</div>
+      <div class="emo">${t.emotion}</div>
+    `;
+    el.addEventListener('click', () => toggleTopping(t.id, el));
+    wrap.appendChild(el);
+  });
+}
+function toggleTopping(id, el){
+  const idx = state.toppingIds.indexOf(id);
+  if(idx > -1){
+    state.toppingIds.splice(idx,1);
+    el.classList.remove('selected');
+  } else {
+    if(state.toppingIds.length >= 2){
+      const hint = $('#step2-hint');
+      hint.textContent = '最多只能選 2 種，先拿掉一個再加吧';
+      hint.style.color = '#E8492F';
+      setTimeout(() => { hint.style.color = ''; hint.textContent = '最多可選 2 種配料'; }, 1400);
+      return;
+    }
+    state.toppingIds.push(id);
+    el.classList.add('selected');
+  }
+  updateJarState();
+}
+function updateJarState(){
+  const btn = $('#btn-to-step3');
+  btn.disabled = state.toppingIds.length === 0;
+  $all('.jar').forEach(j => {
+    const isSelected = state.toppingIds.includes(j.dataset.id);
+    j.classList.toggle('disabled', !isSelected && state.toppingIds.length >= 2);
+  });
+}
+
+/* =========================================================
+   STEP 3 — SHAKE
+   ========================================================= */
+function startShakeScreen(){
+  state.taps = 0;
+  state.timeLeft = 5;
+  $('#meter-fill').style.width = '0%';
+  const bar = $('#timer-fill');
+  bar.style.transition = 'none';
+  bar.style.transform = 'scaleX(1)';
+  showScreen('screen-step3');
+
+  requestAnimationFrame(() => {
+    bar.style.transition = 'transform 5s linear';
+    bar.style.transform = 'scaleX(0)';
+  });
+
+  clearInterval(state.timerId);
+  state.timerId = setInterval(() => {
+    state.timeLeft -= 1;
+    if(state.timeLeft <= 0){
+      clearInterval(state.timerId);
+      finishShake();
+    }
+  }, 1000);
+}
+
+function handleTap(e){
+  state.taps++;
+  const pct = Math.min(100, state.taps * 6);
+  $('#meter-fill').style.width = pct + '%';
+
+  const shaker = $('#shaker');
+  shaker.classList.add('tap');
+  setTimeout(() => shaker.classList.remove('tap'), 90);
+
+  const burst = document.createElement('span');
+  burst.className = 'burst';
+  burst.textContent = pick(['💥','✨','😤','💦','⚡']);
+  const rect = $('#tap-target').getBoundingClientRect();
+  burst.style.left = (rect.width/2 + (Math.random()*60-30)) + 'px';
+  burst.style.top = '0px';
+  $('#shake-burst-host') || null;
+  document.body.appendChild(burst);
+  burst.style.position='fixed';
+  burst.style.left = (rect.left + rect.width/2 + (Math.random()*60-30)) + 'px';
+  burst.style.top = (rect.top) + 'px';
+  setTimeout(() => burst.remove(), 700);
+}
+
+function finishShake(){
+  computeResult();
+  showScreen('screen-result');
+}
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+function computeResult(){
+  const base = getBase();
+  const tops = getToppings();
+
+  let basePct, eachPct;
+  if(tops.length === 1){ basePct = 70; eachPct = 30; }
+  else { basePct = 60; eachPct = 20; }
+
+  const adj = pick(base.adjs);
+  const flavorTail = tops.length ? '．' + tops.map(t => t.flavor).join('') : '';
+  const drinkName = `${adj}${base.teaBase}${flavorTail}`;
+
+  const formulaParts = [`${basePct}%${base.weightLabel}`];
+  tops.forEach(t => formulaParts.push(`${eachPct}%${t.emotion}`));
+  const formula = formulaParts.join(' + ') + `  =  ${drinkName}`;
+
+  const feltList = tops.length
+    ? '，心裡還裝著' + tops.map(t => `「${t.name}」`).join('、') + '的感覺'
+    : '';
+  const analysis = `今天的你，${base.mood}${feltList}。攪拌之後，這些情緒被好好看見，也慢慢融合成了此刻的你 —— 沒關係，都被接住了。`;
+
+  const quote = tops.length ? EMOTION_QUOTES[tops[0].emotion] : GENERAL_QUOTES[base.kind];
+
+  $('#result-name').textContent = drinkName;
+  $('#result-formula').textContent = formula;
+  $('#result-analysis').textContent = analysis;
+  $('#result-quote').textContent = '「' + quote + '」';
+
+  const gradients = {
+    bubble: 'linear-gradient(160deg, #7FC9C0, #4F9E93)',
+    tea: 'linear-gradient(160deg, #A9764F, #5B3A21)',
+    lava: 'linear-gradient(160deg, #FF8064, #C43A22)'
+  };
+  $('#result-glow').style.background = gradients[base.kind];
+
+  $('#store-name').textContent = `憑此畫面至【${CONFIG.storeName}】兌換`;
+  const code = CONFIG.redeemPrefix + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  $('#redeem-code').textContent = code;
+  $('#verified-mark').classList.remove('show');
+  const vbtn = $('#btn-verify');
+  vbtn.disabled = false;
+  vbtn.textContent = '店員核銷（示範用）';
+
+  state.lastResult = { drinkName, formula, analysis, quote, base, tops, code };
+}
+
+/* =========================================================
+   EXPORT CARD (Canvas)
+   ========================================================= */
+function wrapCJK(ctx, text, x, y, maxWidth, lineHeight){
+  let line = '';
+  let cy = y;
+  for(const ch of text){
+    const test = line + ch;
+    if(ctx.measureText(test).width > maxWidth && line){
+      ctx.fillText(line, x, cy);
+      line = ch;
+      cy += lineHeight;
+    } else {
+      line = test;
+    }
+  }
+  if(line){ ctx.fillText(line, x, cy); cy += lineHeight; }
+  return cy;
+}
+
+function drawCard(){
+  const canvas = $('#export-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const r = state.lastResult;
+  if(!r) return canvas;
+
+  const colors = {
+    bubble: ['#7FC9C0', '#4F9E93'],
+    tea: ['#A9764F', '#5B3A21'],
+    lava: ['#FF8064', '#C43A22']
+  }[r.base.kind];
+
+  const grad = ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0, colors[0]);
+  grad.addColorStop(1, colors[1]);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.14)';
+  ctx.beginPath();
+  ctx.arc(W*0.18, H*0.12, 140, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.globalAlpha = .85;
+  ctx.font = '24px sans-serif';
+  ctx.fillText('EMOTION BREWERY · 今日限定情緒特調', 44, 90);
+  ctx.globalAlpha = 1;
+
+  ctx.font = 'bold 46px "Noto Sans TC", sans-serif';
+  wrapCJK(ctx, r.drinkName, 44, 170, W-88, 56);
+
+  ctx.font = '22px "Noto Sans TC", sans-serif';
+  ctx.globalAlpha = .95;
+  const boxY = 300;
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.fillRect(40, boxY-34, W-80, 50);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(r.formula, 56, boxY);
+  ctx.globalAlpha = 1;
+
+  ctx.font = '24px "Noto Sans TC", sans-serif';
+  wrapCJK(ctx, r.analysis, 44, 400, W-88, 38);
+
+  ctx.font = 'italic 22px "Noto Sans TC", sans-serif';
+  ctx.globalAlpha = .95;
+  wrapCJK(ctx, '「' + r.quote + '」', 44, H-160, W-88, 32);
+  ctx.globalAlpha = 1;
+
+  ctx.font = '20px monospace';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillText(`兌換碼 ${r.code} · ${CONFIG.storeName}`, 44, H-60);
+
+  return canvas;
+}
+
+function saveCard(){
+  const canvas = drawCard();
+  const link = document.createElement('a');
+  link.download = `情緒特調-${state.lastResult ? state.lastResult.drinkName : 'card'}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+$('#btn-start').addEventListener('click', () => {
+  buildTubes();
+  showScreen('screen-step1');
+});
+
+$('#btn-to-step3').addEventListener('click', startShakeScreen);
+
+$('#tap-target').addEventListener('click', handleTap);
+$('#tap-target').addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); }, {passive:false});
+
+$('#btn-save').addEventListener('click', saveCard);
+
+$('#btn-verify').addEventListener('click', () => {
+  const mark = $('#verified-mark');
+  const now = new Date();
+  const t = now.toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
+  mark.textContent = `✅ 已核銷（${t}）`;
+  mark.classList.add('show');
+  $('#btn-verify').disabled = true;
+  $('#btn-verify').textContent = '已完成核銷';
+});
+
+$('#btn-restart').addEventListener('click', () => {
+  state.baseId = null;
+  state.toppingIds = [];
+  state.taps = 0;
+  clearInterval(state.timerId);
+  $('#step1-hint').textContent = '點擊上方任一試管';
+  $('#cup-fill').style.height = '0%';
+  showScreen('screen-intro');
+});
+</script>
+</body>
+</html>
