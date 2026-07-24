@@ -369,6 +369,9 @@
     background: rgba(255,255,255,0.18);
     display:inline-block; padding:6px 10px; border-radius:10px;
   }
+  .result-plus{
+    font-size:12px; opacity:.85; position:relative; margin-bottom:12px;
+  }
   .result-analysis{
     font-size:13.5px; line-height:1.8; position:relative; margin-bottom:10px;
   }
@@ -471,6 +474,7 @@
         <div class="result-eyebrow">今日限定 · 情緒特調</div>
         <div class="result-name display" id="result-name"></div>
         <div class="result-formula" id="result-formula"></div>
+        <div class="result-plus" id="result-plus"></div>
         <div class="result-analysis" id="result-analysis"></div>
         <div class="result-quote" id="result-quote"></div>
       </div>
@@ -512,32 +516,29 @@ const BASES = [
   {
     id:'bubble', name:'透明氣泡水', kind:'bubble',
     mood:'今天很輕盈、平靜，好像沒什麼特別的念頭',
-    weightLabel:'平靜', teaBase:'氣泡水系',
-    adjs:['清透的','安靜的','無波的'],
+    weightLabel:'平靜',
     fx:'bubbles'
   },
   {
     id:'tea', name:'濃厚深色茶', kind:'tea',
     mood:'今天有點沉重、疲憊，像被灌了一整杯水泥',
-    weightLabel:'沉重', teaBase:'厚萃烏龍',
-    adjs:['厚重的','沉甸甸的','緩慢的'],
+    weightLabel:'沉重',
     fx:'steam'
   },
   {
     id:'lava', name:'冒煙紅色岩漿', kind:'lava',
     mood:'今天很焦躁、心跳偏快，心裡有一股說不上來的火',
-    weightLabel:'滾燙', teaBase:'紅焰可可',
-    adjs:['灼熱的','翻騰的','躁動的'],
+    weightLabel:'滾燙',
     fx:'steam'
   }
 ];
 
 const TOPPINGS = [
-  { id:'cloud',   name:'想太多的烏雲',       emotion:'焦慮', icon:'☁️', flavor:'仙草凍',   color:'#8E9AAF' },
-  { id:'candy',   name:'易燃易爆炸的跳跳糖', emotion:'生氣', icon:'⚡', flavor:'跳跳珍珠', color:'#FF4E4E' },
-  { id:'rain',    name:'下不停的梅雨',       emotion:'難過', icon:'🌧️', flavor:'梅子晶球', color:'#5B8AC1' },
-  { id:'battery', name:'乾涸的廢電池',       emotion:'疲累', icon:'🔋', flavor:'黑糖波霸', color:'#6B6B6B' },
-  { id:'star',    name:'亮晶晶的星星',       emotion:'開心', icon:'⭐', flavor:'金萱奶蓋', color:'#FFC94A' },
+  { id:'cloud',   name:'想太多的烏雲',       emotion:'焦慮', icon:'☁️', color:'#8E9AAF' },
+  { id:'candy',   name:'易燃易爆炸的跳跳糖', emotion:'生氣', icon:'⚡', color:'#FF4E4E' },
+  { id:'rain',    name:'下不停的梅雨',       emotion:'難過', icon:'🌧️', color:'#5B8AC1' },
+  { id:'battery', name:'乾涸的廢電池',       emotion:'疲累', icon:'🔋', color:'#6B6B6B' },
+  { id:'star',    name:'亮晶晶的星星',       emotion:'開心', icon:'⭐', color:'#FFC94A' },
 ];
 
 const EMOTION_QUOTES = {
@@ -552,6 +553,56 @@ const GENERAL_QUOTES = {
   'tea': '累的時候，不用假裝自己很有力氣。',
   'lava': '心跳很快的時候，先深呼吸，你沒有做錯什麼。'
 };
+
+/* =========================================================
+   MENU — 對照到真實飲料品項
+   單一配料：依「情緒 x 基底」找到對應茶飲
+   雙配料：依「兩種情緒的組合」找到對應茶飲（與基底無關）
+   PLUS：依基底決定加料
+   ========================================================= */
+const EMOTIONS_ORDER = ['焦慮','生氣','難過','疲累','開心'];
+
+// Original TEA + Classic MILK TEA + Fresh MILK（單一配料 x 基底）
+const SINGLE_MENU = {
+  '焦慮':   { bubble:'綠茶',       tea:'春烏龍',     lava:'紅茶'       }, // Original TEA
+  '生氣':   { bubble:'輕烏龍',     tea:'焙烏龍',     lava:'緋烏龍'     }, // Original TEA
+  '難過':   { bubble:'奶茶',       tea:'珍珠奶茶',   lava:'焙烏龍奶茶' }, // Classic MILK TEA
+  '疲累':   { bubble:'黃金珍珠奶綠', tea:'烘吉奶茶', lava:'奶茶'       }, // Classic MILK TEA
+  '開心':   { bubble:'紅茶鮮奶',   tea:'焙烏龍鮮奶', lava:'緋烏龍鮮奶' }  // Fresh MILK
+};
+
+// Double FRUIT + Cheese MILK FOAM（兩種配料組合，與基底無關）
+const PAIR_MENU = {
+  '焦慮+生氣': '芝士奶蓋春烏龍',   // Cheese MILK FOAM
+  '焦慮+難過': '芝士奶蓋焙烏龍',   // Cheese MILK FOAM
+  '焦慮+疲累': '甘蔗春烏龍',       // Double FRUIT
+  '焦慮+開心': '優酪春烏龍',       // Double FRUIT
+  '生氣+難過': '芝士奶蓋阿華田',   // Cheese MILK FOAM
+  '生氣+疲累': '青梅春烏龍',       // Double FRUIT
+  '生氣+開心': '香橙春烏龍',       // Double FRUIT
+  '難過+疲累': '芝士奶蓋緋烏龍',   // Cheese MILK FOAM
+  '難過+開心': '雙柚金烏龍',       // Double FRUIT
+  '疲累+開心': '檸檬春烏龍'        // Double FRUIT
+};
+
+// PLUS 加料，依基底決定
+const PLUS_BY_BASE = {
+  bubble: '焙烏龍茶凍',
+  tea: '珍珠',
+  lava: '黃金珍珠'
+};
+
+function pairKey(e1, e2){
+  return EMOTIONS_ORDER.indexOf(e1) <= EMOTIONS_ORDER.indexOf(e2) ? `${e1}+${e2}` : `${e2}+${e1}`;
+}
+
+function lookupDrinkName(base, tops){
+  if(tops.length === 1){
+    return SINGLE_MENU[tops[0].emotion][base.kind];
+  }
+  const key = pairKey(tops[0].emotion, tops[1].emotion);
+  return PAIR_MENU[key];
+}
 
 /* =========================================================
    STATE
@@ -744,13 +795,13 @@ function computeResult(){
   if(tops.length === 1){ basePct = 70; eachPct = 30; }
   else { basePct = 60; eachPct = 20; }
 
-  const adj = pick(base.adjs);
-  const flavorTail = tops.length ? '．' + tops.map(t => t.flavor).join('') : '';
-  const drinkName = `${adj}${base.teaBase}${flavorTail}`;
+  const drinkName = lookupDrinkName(base, tops);
+  const plusItem = PLUS_BY_BASE[base.kind];
 
   const formulaParts = [`${basePct}%${base.weightLabel}`];
   tops.forEach(t => formulaParts.push(`${eachPct}%${t.emotion}`));
   const formula = formulaParts.join(' + ') + `  =  ${drinkName}`;
+  const plusLine = `PLUS 加料：${plusItem}`;
 
   const feltList = tops.length
     ? '，心裡還裝著' + tops.map(t => `「${t.name}」`).join('、') + '的感覺'
@@ -761,6 +812,7 @@ function computeResult(){
 
   $('#result-name').textContent = drinkName;
   $('#result-formula').textContent = formula;
+  $('#result-plus').textContent = plusLine;
   $('#result-analysis').textContent = analysis;
   $('#result-quote').textContent = '「' + quote + '」';
 
@@ -779,7 +831,7 @@ function computeResult(){
   vbtn.disabled = false;
   vbtn.textContent = '店員核銷（示範用）';
 
-  state.lastResult = { drinkName, formula, analysis, quote, base, tops, code };
+  state.lastResult = { drinkName, formula, plusLine, analysis, quote, base, tops, code };
 }
 
 /* =========================================================
@@ -844,6 +896,11 @@ function drawCard(){
   ctx.fillRect(40, boxY-34, W-80, 50);
   ctx.fillStyle = '#ffffff';
   ctx.fillText(r.formula, 56, boxY);
+  ctx.globalAlpha = 1;
+
+  ctx.font = '20px "Noto Sans TC", sans-serif';
+  ctx.globalAlpha = .85;
+  ctx.fillText(r.plusLine, 44, boxY + 46);
   ctx.globalAlpha = 1;
 
   ctx.font = '24px "Noto Sans TC", sans-serif';
