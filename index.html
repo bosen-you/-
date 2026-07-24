@@ -67,6 +67,7 @@
     padding: 30px 26px 26px;
     position:relative;
     overflow:hidden;
+    -webkit-animation: cardIn .5s cubic-bezier(.2,.8,.2,1);
     animation: cardIn .5s cubic-bezier(.2,.8,.2,1);
   }
   @keyframes cardIn{
@@ -131,6 +132,7 @@
     background: conic-gradient(from 200deg, var(--bubble), var(--gold), var(--lava), var(--tea), var(--bubble));
     display:flex; align-items:center; justify-content:center;
     box-shadow: var(--shadow-sm);
+    -webkit-animation: spinSlow 14s linear infinite;
     animation: spinSlow 14s linear infinite;
   }
   @keyframes spinSlow{ to{ transform:rotate(360deg);} }
@@ -139,6 +141,7 @@
     background:var(--paper);
     display:flex; align-items:center; justify-content:center;
     font-size:34px;
+    -webkit-animation: spinSlow 14s linear infinite reverse;
     animation: spinSlow 14s linear infinite reverse;
   }
 
@@ -188,6 +191,7 @@
     border-radius: 16px 16px 34px 34px;
     background: rgba(255,255,255,0.5);
     overflow:hidden;
+    -webkit-animation: wobble 3.4s ease-in-out infinite;
     animation: wobble 3.4s ease-in-out infinite;
     box-shadow: var(--shadow-sm);
   }
@@ -204,6 +208,7 @@
   .tube .liquid::before{
     content:''; position:absolute; top:-6px; left:0; right:0; height:14px;
     background:inherit; border-radius:50%;
+    -webkit-animation: rippl 2.2s ease-in-out infinite;
     animation: rippl 2.2s ease-in-out infinite;
   }
   @keyframes rippl{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(2px);} }
@@ -215,6 +220,7 @@
   .bub{
     position:absolute; bottom:0; border-radius:50%;
     background: rgba(255,255,255,0.75);
+    -webkit-animation: rise 3s ease-in infinite;
     animation: rise 3s ease-in infinite;
   }
   @keyframes rise{
@@ -225,6 +231,7 @@
   .steam{
     position:absolute; top:-18px; width:3px; height:16px; border-radius:3px;
     background: rgba(255,255,255,0.8);
+    -webkit-animation: puff 1.8s ease-in-out infinite;
     animation: puff 1.8s ease-in-out infinite;
   }
   @keyframes puff{
@@ -336,6 +343,7 @@
   }
   .burst{
     position:absolute; font-size:16px; pointer-events:none;
+    -webkit-animation: burstUp .7s ease-out forwards;
     animation: burstUp .7s ease-out forwards;
   }
   @keyframes burstUp{
@@ -402,8 +410,18 @@
 
   .fine-print{ text-align:center; font-size:10.5px; color:var(--ink-soft); margin-top:14px; line-height:1.6; }
 
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  /* 手機瀏覽器（尤其 iOS Safari / LINE·FB 內建瀏覽器）動畫渲染修正：
+     強制開啟硬體加速圖層，避免動畫在部分手機瀏覽器上完全不播放 */
+  *, *::before, *::after{
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .tube, .liquid, .liquid::before, .bub, .steam,
+  .brewery-badge, .brewery-badge span, .shaker, .shaker .jar-body,
+  .card, .cup .fill, .meter .fill, .timer-bar .fill, .burst{
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   button:focus-visible, .jar:focus-visible, .tube-wrap:focus-visible{
